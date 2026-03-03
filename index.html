@@ -12,7 +12,6 @@
         body { font-family: 'Inter', sans-serif; background: #fff; color: #000; overflow: hidden; touch-action: manipulation; }
         .bg-magenta { background-color: #FF00FF; }
         .text-magenta { color: #FF00FF; }
-        .text-lime { color: #A3FF00; }
         .rounded-yao { border-radius: 30px; }
         .hidden { display: none !important; }
 
@@ -42,30 +41,21 @@
         }
 
         /* Botón de Enviar Rayo Pro */
-        .btn-send-navi { background: #000; color: #A3FF00; width: 48px; height: 48px; border-radius: 50%; display: flex; align-items: center; justify-content: center; border: 2px solid #A3FF00; box-shadow: 0 0 10px rgba(163, 255, 0, 0.4); transition: all 0.2s; flex-shrink: 0; }
-        .btn-send-navi:active { transform: scale(0.9); box-shadow: 0 0 2px rgba(163, 255, 0, 0.2); }
+        .btn-send-navi { background: #000; color: #A3FF00; width: 48px; height: 48px; border-radius: 50%; display: flex; align-items: center; justify-content: center; border: 2px solid #A3FF00; box-shadow: 0 0 10px rgba(163, 255, 0, 0.4); transition: all 0.2s; flex-shrink: 0; cursor: pointer; }
+        .btn-send-navi:active { transform: scale(0.9); }
     </style>
 </head>
 <body class="antialiased">
 
     <div id="secretZone" class="fixed top-0 left-0 w-16 h-16 z-[9999]"></div>
 
-    <section id="loginScreen" class="fixed inset-0 flex flex-col items-center justify-center p-6 z-[5000] bg-white text-center">
+    <section id="loginScreen" class="fixed inset-0 flex flex-col items-center justify-center p-6 z-[5000] bg-white">
         <div class="w-20 h-20 bg-black rounded-full flex items-center justify-center text-magenta font-black text-xl mb-10 navi-pulse">NAVI</div>
         <div class="w-full max-w-xs space-y-4">
-            <input type="password" id="pinAcceso" maxlength="4" placeholder="PIN" class="text-3xl tracking-[0.3em] text-center bg-gray-50 border-2 rounded-2xl p-4 w-full outline-none focus:border-magenta">
+            <input type="password" id="pinAcceso" maxlength="4" placeholder="PIN" class="text-3xl tracking-[0.3em] text-center bg-gray-50 border-2 rounded-2xl p-4 w-full outline-none">
             <button onclick="validarEntrada()" class="w-full bg-black text-white py-5 rounded-full font-black text-[10px] uppercase border-2 border-magenta">Entrar</button>
-            <button onclick="abrirRecovery()" class="text-[9px] font-bold text-gray-300 uppercase italic">Olvidé mi PIN</button>
         </div>
     </section>
-
-    <div id="recoveryCard" class="hidden fixed inset-0 bg-black/60 z-[6000] flex items-end">
-        <div class="w-full bg-white rounded-t-[40px] p-8 slide-up">
-            <input type="password" id="passRecovery" placeholder="Master Pass" class="admin-input mb-4 text-center">
-            <button onclick="validarRecovery()" class="w-full bg-magenta text-white py-4 rounded-full font-black text-[10px] uppercase mb-4">Validar</button>
-            <button onclick="cerrarRecovery()" class="w-full text-[9px] font-bold text-gray-400 uppercase text-center">Volver</button>
-        </div>
-    </div>
 
     <main id="mainHub" class="hidden min-h-screen p-6 bg-gray-50 overflow-y-auto">
         <header class="mb-8 mt-4"><h1 class="text-5xl font-black italic tracking-tighter uppercase">NAVI</h1></header>
@@ -82,7 +72,7 @@
     </main>
 
     <div id="chatInterface" class="hidden fixed inset-0 bg-white z-[4000] flex flex-col">
-        <header class="p-4 bg-black text-white flex justify-between items-center">
+        <header class="p-4 bg-black text-white flex justify-between items-center shadow-lg">
             <div class="flex-1 flex justify-center gap-10">
                 <button onclick="switchTab('tab-chat')" id="nav-chat" class="text-xl text-magenta border-b-2 border-magenta pb-1"><i class="fas fa-comment-dots"></i></button>
                 <button onclick="switchTab('tab-code')" id="nav-code" class="text-xl text-gray-500"><i class="fas fa-code"></i></button>
@@ -91,69 +81,43 @@
             <button onclick="cerrarChat()" class="w-10 h-10 bg-gray-900 rounded-full flex items-center justify-center border border-magenta"><i class="fas fa-times text-magenta"></i></button>
         </header>
         
-        <div class="flex-1 relative bg-gray-50 overflow-hidden">
+        <div class="flex-1 relative bg-gray-50 overflow-hidden flex flex-col">
             <div id="tab-chat" class="absolute inset-0 flex flex-col">
                 <div id="chatBox" class="flex-1 overflow-y-auto p-6 space-y-4"></div>
                 <div class="p-4 bg-white border-t-2">
                     <div class="flex items-center gap-3 bg-gray-100 rounded-3xl px-4 py-2 border-2 border-transparent focus-within:border-magenta">
-                        <label class="p-2 text-gray-400 cursor-pointer"><i class="fas fa-paperclip text-xl"></i><input type="file" class="hidden"></label>
-                        <input type="text" placeholder="Orden para Navi..." class="flex-1 bg-transparent py-3 text-sm font-bold text-black outline-none">
-                        <button class="btn-send-navi"><i class="fas fa-bolt"></i></button>
+                        <label class="p-2 text-gray-400"><i class="fas fa-paperclip text-xl"></i><input type="file" class="hidden"></label>
+                        <input type="text" id="userInput" placeholder="Orden para Navi..." class="flex-1 bg-transparent py-3 text-sm font-bold text-black outline-none">
+                        <button onclick="enviarMensaje()" class="btn-send-navi"><i class="fas fa-bolt"></i></button>
                     </div>
                 </div>
             </div>
 
             <div id="tab-code" class="hidden absolute inset-0 flex flex-col bg-[#000]">
-                <div class="flex justify-between items-center p-3 bg-[#0a0a0a] border-b border-gray-800">
-                    <span class="text-[9px] font-bold text-gray-500 uppercase px-2 italic">Navi Editor</span>
-                    <button onclick="copiarCodigo()" class="bg-magenta/20 text-magenta px-4 py-1 rounded-lg text-[9px] font-black uppercase border border-magenta/30">Copiar</button>
-                </div>
                 <div class="code-container">
                     <div id="lineNumbers" class="line-numbers">1</div>
-                    <textarea id="codeEditor" spellcheck="false" oninput="updateLineNumbers()" onscroll="syncScroll()">// Sistema Navi Online</textarea>
+                    <textarea id="codeEditor" spellcheck="false" oninput="updateLineNumbers()" onscroll="syncScroll()">// Modo edición activado</textarea>
                 </div>
-            </div>
-
-            <div id="tab-view" class="hidden absolute inset-0 bg-white" ondblclick="switchTab('tab-code')">
-                <div class="w-full h-full border-4 border-dashed border-gray-100 rounded-[40px] flex items-center justify-center text-gray-200 uppercase font-black text-[10px]">Preview Mode</div>
             </div>
         </div>
     </div>
 
     <div id="adminPanel" class="hidden fixed inset-0 bg-white z-[7000] overflow-y-auto p-6">
         <div class="flex justify-between items-center mb-6 border-b-2 border-magenta pb-4">
-            <h1 class="text-xl font-black uppercase text-magenta">Navi Admin Control</h1>
+            <h1 class="text-xl font-black uppercase text-magenta">Navi Admin</h1>
             <button onclick="cerrarAdmin()" class="w-10 h-10 bg-gray-100 rounded-full flex items-center justify-center"><i class="fas fa-times"></i></button>
         </div>
-
-        <div class="bg-black p-5 rounded-yao mb-6 text-white border-2 border-magenta">
-            <h2 class="font-black text-[9px] uppercase text-magenta mb-4 italic">Seguridad Admin</h2>
-            <div class="space-y-3">
-                <input type="number" id="pinActual" placeholder="PIN Actual" class="admin-input bg-gray-900 border-none text-white">
-                <input type="number" id="pinNuevo" placeholder="PIN Nuevo" class="admin-input bg-gray-900 border-none text-white">
-                <select id="letraSecreta" class="admin-input bg-black text-magenta border-magenta">
-                    <option value="">Letra Validación</option>
-                    <option value="O">O</option><option value="X">X</option>
-                </select>
-                <button onclick="cambiarMiPin()" class="w-full bg-magenta text-white py-4 rounded-full font-black text-[10px] uppercase">Actualizar Mi PIN</button>
-            </div>
-        </div>
-
         <div class="bg-gray-100 p-5 rounded-yao mb-6 space-y-3">
-            <h2 id="formTitle" class="font-black text-[10px] uppercase text-gray-400">Usuarios</h2>
             <input type="text" id="regNombre" placeholder="Nombre" class="admin-input">
             <input type="number" id="regPin" placeholder="PIN" class="admin-input">
-            <select id="regActivo" class="admin-input">
-                <option value="true">Activo</option><option value="false">Inactivo</option>
-            </select>
-            <button onclick="guardarUsuario()" class="w-full bg-black text-white py-4 rounded-full font-black text-[10px] uppercase border-2 border-magenta">Guardar Usuario</button>
+            <button onclick="guardarUsuario()" class="w-full bg-black text-white py-4 rounded-full font-black text-[10px] uppercase border-2 border-magenta">Guardar</button>
         </div>
         <div id="listaUsuarios" class="space-y-2 pb-20"></div>
     </div>
 
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
-        import { getFirestore, doc, setDoc, getDoc, deleteDoc, onSnapshot, collection, query, where, getDocs } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+        import { getFirestore, doc, setDoc, deleteDoc, onSnapshot, collection, query, where, getDocs } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
 
         const firebaseConfig = {
             apiKey: "AIzaSyBmQG-rjYN9juqH0ljkc16M-Atf1oIz6K0",
@@ -166,15 +130,42 @@
         const app = initializeApp(firebaseConfig);
         const db = getFirestore(app);
 
-        // UI HELPERS
-        window.updateLineNumbers = () => {
-            const lines = document.getElementById('codeEditor').value.split('\n').length;
-            document.getElementById('lineNumbers').innerHTML = Array.from({length: lines}, (_, i) => i + 1).join('<br>');
+        // --- LÓGICA DEL CHAT ---
+        window.enviarMensaje = () => {
+            const input = document.getElementById('userInput');
+            const chatBox = document.getElementById('chatBox');
+            const texto = input.value.trim();
+
+            if (!texto) return;
+
+            // Burbuja de Usuario
+            const userDiv = document.createElement('div');
+            userDiv.className = "flex justify-end mb-4";
+            userDiv.innerHTML = `<div class="bg-black text-white p-4 rounded-t-2xl rounded-bl-2xl max-w-[85%] border-b-2 border-magenta text-xs font-bold shadow-lg">${texto}</div>`;
+            chatBox.appendChild(userDiv);
+
+            input.value = "";
+            chatBox.scrollTop = chatBox.scrollHeight;
+
+            // Respuesta de NAVI
+            setTimeout(() => {
+                const naviDiv = document.createElement('div');
+                naviDiv.className = "flex justify-start mb-4";
+                naviDiv.innerHTML = `<div class="bg-white text-black p-4 rounded-t-2xl rounded-br-2xl max-w-[85%] border-l-4 border-magenta shadow-md text-xs font-medium">
+                    <span class="text-[9px] font-black text-magenta block mb-1">NAVI SYSTEM</span>
+                    Procesando requerimiento en tiempo real...
+                </div>`;
+                chatBox.appendChild(naviDiv);
+                chatBox.scrollTop = chatBox.scrollHeight;
+            }, 800);
         };
-        window.syncScroll = () => { document.getElementById('lineNumbers').scrollTop = document.getElementById('codeEditor').scrollTop; };
-        
+
+        // Escuchar Enter
+        document.getElementById('userInput').addEventListener('keypress', (e) => { if (e.key === 'Enter') enviarMensaje(); });
+
+        // --- NAVEGACIÓN ---
         window.switchTab = (id) => {
-            ['tab-chat', 'tab-code', 'tab-view'].forEach(t => {
+            ['tab-chat', 'tab-code'].forEach(t => {
                 document.getElementById(t).classList.add('hidden');
                 document.getElementById('nav-' + t.split('-')[1]).className = 'text-xl text-gray-500';
             });
@@ -182,58 +173,29 @@
             document.getElementById('nav-' + id.split('-')[1]).className = 'text-xl text-magenta border-b-2 border-magenta pb-1';
         };
 
-        window.abrirChat = () => document.getElementById('chatInterface').classList.remove('hidden');
+        window.abrirChat = (cat) => {
+            document.getElementById('chatInterface').classList.remove('hidden');
+            const chatBox = document.getElementById('chatBox');
+            chatBox.innerHTML = `<p class="text-[10px] text-center text-gray-400 font-black uppercase mb-4 tracking-widest">--- Acceso a ${cat} ---</p>`;
+        };
         window.cerrarChat = () => document.getElementById('chatInterface').classList.add('hidden');
         window.cerrarAdmin = () => document.getElementById('adminPanel').classList.add('hidden');
 
-        // FIREBASE LOGIC
-        window.guardarUsuario = async () => {
-            const pin = document.getElementById('regPin').value.toString();
-            const u = { nombre: document.getElementById('regNombre').value, pin: pin, activo: document.getElementById('regActivo').value === "true" };
-            await setDoc(doc(db, "usuarios_autorizados", pin), u);
-            alert("Listo");
-        };
-
-        window.cargarUsuarios = () => {
-            onSnapshot(collection(db, "usuarios_autorizados"), (snap) => {
-                const lista = document.getElementById('listaUsuarios'); lista.innerHTML = "";
-                snap.forEach(d => {
-                    const u = d.data();
-                    const div = document.createElement('div');
-                    div.className = "p-4 bg-gray-50 rounded-2xl border flex justify-between items-center";
-                    div.innerHTML = `<div><p class="font-black text-[10px] uppercase">${u.nombre}</p><p class="text-[8px] font-bold text-gray-400 italic">PIN: ${u.pin}</p></div>
-                                     <div class="flex gap-2">
-                                        <button onclick="editarUser('${u.pin}', '${u.nombre}', ${u.activo})" class="text-blue-500 p-2"><i class="fas fa-pen"></i></button>
-                                        <button onclick="borrarUser('${u.pin}')" class="text-red-500 p-2"><i class="fas fa-trash"></i></button>
-                                     </div>`;
-                    lista.appendChild(div);
-                });
-            });
-        };
-
-        window.editarUser = (pin, nombre, activo) => {
-            document.getElementById('regNombre').value = nombre; document.getElementById('regPin').value = pin;
-            document.getElementById('regActivo').value = activo.toString();
-            window.scrollTo({ top: 0, behavior: 'smooth' });
-        };
-
-        window.borrarUser = async (id) => { if(confirm("¿Eliminar?")) await deleteDoc(doc(db, "usuarios_autorizados", id)); };
-
-        // GESTO ADMIN
-        let cl = 0;
-        document.getElementById('secretZone').onclick = () => { cl++; if(cl >= 4) { if(prompt("PASS:") === "2132") { document.getElementById('adminPanel').classList.remove('hidden'); cargarUsuarios(); } cl = 0; } };
-
+        // --- ADMIN & LOGIN ---
         window.validarEntrada = async () => {
             const pin = document.getElementById('pinAcceso').value;
-            const q = query(collection(db, "usuarios_autorizados"), where("pin", "==", pin.toString()), where("activo", "==", true));
+            const q = query(collection(db, "usuarios_autorizados"), where("pin", "==", pin.toString()));
             const snap = await getDocs(q);
-            if(!snap.empty) { document.getElementById('loginScreen').classList.add('hidden'); document.getElementById('mainHub').classList.remove('hidden'); }
-            else { alert("ERROR"); }
+            if(!snap.empty) {
+                document.getElementById('loginScreen').classList.add('hidden');
+                document.getElementById('mainHub').classList.remove('hidden');
+            } else { alert("ACCESO DENEGADO"); }
         };
 
-        window.abrirRecovery = () => document.getElementById('recoveryCard').classList.remove('hidden');
-        window.cerrarRecovery = () => document.getElementById('recoveryCard').classList.add('hidden');
-        window.validarRecovery = () => { if(document.getElementById('passRecovery').value === "2132") { document.getElementById('loginScreen').classList.add('hidden'); document.getElementById('mainHub').classList.remove('hidden'); cerrarRecovery(); } };
+        let cl = 0;
+        document.getElementById('secretZone').onclick = () => {
+            cl++; if(cl >= 4) { if(prompt("SISTEMA:") === "2132") document.getElementById('adminPanel').classList.remove('hidden'); cl=0; }
+        };
     </script>
 </body>
 </html>
